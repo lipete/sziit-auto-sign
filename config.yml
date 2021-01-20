@@ -1,0 +1,45 @@
+# 用户配置项
+users:
+  - username: 
+    password: 
+    # 接收签到结果通知的邮箱
+    email: 
+    # 签到地址，如：中国xx省xx市xx县
+    address: 
+    # 经度
+    lon: 
+    # 纬度
+    lat: 
+    # serveChan 密钥，获取方式：http://sc.ftqq.com/?c=code
+    sckey: 
+    # serverChan消息标题
+    serverChanSubject: '今日校园签到'
+    # 邮件消息标题
+    emailSubject: '今日校园签到'
+  
+  # 其他用户配置
+  # - username: 
+  #   password: 
+  #   email: 
+  #   address: 
+  #   lon: 
+  #   lat: 
+  #   sckey: 
+  #   serverChanSubject: ''
+  #   emailSubject: ''
+
+# 签到任务信息，顺序最好与今日校园的一致
+fields:
+  - title: '您的体温是否在37.3°及以上？'
+    value: '否'
+  - title: '您是否存在咳嗽，流鼻涕等感冒症状？'
+    value: '否'
+
+# 通知邮箱配置，最好不要与接收通知的邮箱一样
+email:
+  # 用户名
+  user: ''
+  # 授权码，而非密码
+  password: ''
+  # 邮箱所处的域名服务器地址，如：smtp.163.com
+  host: ''
