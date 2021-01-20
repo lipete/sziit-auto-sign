@@ -220,7 +220,7 @@ def main():
     cpdaily = Cpdaily()
 
     for user in users:
-        print(user['username'])
+        logger.info(user['username'])
         if cpdaily.login(user['username'], user['password']):
             task_list = cpdaily.getTaskList()
             for t in task_list:
@@ -246,6 +246,14 @@ def main():
                         message=message
                     )
 
+
+def main_handler(event, context):
+    try:
+        main()
+    except Exception as e:
+        print('出问题了：', str(e))
+    else:
+        return 'success'
 
 if __name__ == "__main__":
     main()
