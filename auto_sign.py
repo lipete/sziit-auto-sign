@@ -173,7 +173,6 @@ def loadConfig(filename: str='config.yml') -> dict:
         logger.error('配置文件后缀不是.yml或.yaml',)
         return
 
-    config: Any
     with open(filename, 'r') as f:
         config = yaml.load(f.read(), Loader=yaml.FullLoader)
     return config
