@@ -24,9 +24,7 @@ class Cpdaily:
     def __init__(self) -> None:
         # 今日校园App密钥
         self.key = 'b3L26XNL'
-        # 登录url
         self.login_url = 'https://auth.sziit.edu.cn/authserver'
-        # 登录成功后跳转的url
         self.login_success_url = 'https://auth.sziit.edu.cn/authserver/index.do'
         self.host = 'sziit.campusphere.net'
         self.session = requests.session()
@@ -37,7 +35,7 @@ class Cpdaily:
             'appVersion': '8.1.14',
             'deviceId': str(uuid.uuid1()),
             'systemName': 'Android',
-            'systemVersion': '4.4.4',
+            'systemVersion': '8.0',
             'userId': 'foo'
         }
         self.headers = {
@@ -93,14 +91,14 @@ class Cpdaily:
 
     def getTaskList(self) -> list:
         ''' 获取所有未签到的任务 '''
-        self.headers = {
+        self.headers.update({
             'Accept': 'application/json, text/plain, */*',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
             'content-type': 'application/json',
             'Accept-Encoding': 'gzip,deflate',
             'Accept-Language': 'zh-CN,en-US;q=0.8',
             'Content-Type': 'application/json;charset=UTF-8'
-        }
+        })
         self.session.headers.update({
             **self.headers
         })
@@ -160,10 +158,8 @@ class Cpdaily:
             f'https://{self.host}/wec-counselor-sign-apps/stu/sign/submitSign', 
             data=json.dumps(form)).json()
         
-        signed = ret['code'] == 0
-        message = '签到成功' if signed else f"签到失败，原因：{ret['message']}"
-        logger.info(message)
-        return signed, message
+        message = ret.json()['message']
+        return message
 
 
 def loadConfig(filename: str='config.yml') -> dict:
@@ -213,7 +209,7 @@ def sendByEmail(
     
 
 def main():
-    config = loadConfig('config.yml')
+    config = loadConfig('_config.yml')
     users = config.get('users')
     fields = config.get('fields')
     email = config.get('email')
@@ -226,25 +222,30 @@ def main():
             for t in task_list:
                 task = cpdaily.getTaskDetail(t['signWid'], t['signInstanceWid'])
                 form = cpdaily.fillForm(task, fields, user)
-                signed, message = cpdaily.submit(form, user)
+                message = cpdaily.submit(form, user)
 
-                # 签到成功，推送消息
-                if signed:
-                    sendByServerChan(
-                        sckey=user['sckey'], 
-                        subject=user['serverChanSubject'], 
-                        message=message)
+                if message == '任务未开始，扫码签到无效！':
+                    continue
+                
+                if message == 'SUCCESS':
+                    message = '签到成功'
 
-                    now = datetime.now(timezone('Asia/Shanghai')).strftime('%Y年%m月%d日')
-                    message = f'{now}\n{message}'
-                    sendByEmail(
-                        user=email['user'], 
-                        password=email['password'], 
-                        host=email['host'], 
-                        to=user['email'],
-                        subject=user['emailSubject'],
-                        message=message
-                    )
+                # 推送签到结果
+                sendByServerChan(
+                    sckey=user['sckey'], 
+                    subject=user['serverChanSubject'], 
+                    message=message)
+
+                now = datetime.now(timezone('Asia/Shanghai')).strftime('%Y年%m月%d日 %H:%M')
+                message = f'{now}\n{message}'
+                sendByEmail(
+                    user=email['user'], 
+                    password=email['password'], 
+                    host=email['host'], 
+                    to=user['email'],
+                    subject=user['emailSubject'],
+                    message=message
+                )
 
 
 def main_handler(event, context):
