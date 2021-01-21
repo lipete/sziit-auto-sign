@@ -208,7 +208,7 @@ def sendByEmail(
     
 
 def main():
-    config = loadConfig('_config.yml')
+    config = loadConfig('config.yml')
     users = config.get('users')
     fields = config.get('fields')
     email = config.get('email')
