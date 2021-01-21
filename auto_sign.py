@@ -158,8 +158,7 @@ class Cpdaily:
             f'https://{self.host}/wec-counselor-sign-apps/stu/sign/submitSign', 
             data=json.dumps(form)).json()
         
-        message = ret.json()['message']
-        return message
+        return ret['message']
 
 
 def loadConfig(filename: str='config.yml') -> dict:
