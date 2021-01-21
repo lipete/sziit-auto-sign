@@ -223,6 +223,7 @@ def main():
                 task = cpdaily.getTaskDetail(t['signWid'], t['signInstanceWid'])
                 form = cpdaily.fillForm(task, fields, user)
                 message = cpdaily.submit(form, user)
+                logger.info(message)
 
                 if message == '任务未开始，扫码签到无效！':
                     continue
