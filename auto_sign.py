@@ -41,7 +41,7 @@ class Cpdaily:
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 Edg/83.0.478.37',
             'Pragma': 'no-cache',
-            'Accept': 'application/json, text/plain, */*',
+            'Accept': 'application/json, text/plain, */*'
         }
 
     def desEncrypt(self, text: str) -> str:
@@ -185,10 +185,15 @@ def sendByServerChan(sckey: str, subject: str, message: str) -> None:
         'text': subject,
         'desp': message
     }
-    ret = requests.get(url, params).json()
+    ret = requests.get(url, params)
+    logger.info(ret.status_code)
+    if ret.status_code != 200:
+        logger.error(f'ServerChan消息推送失败。HTTP状态码:{ret.status_code}')
+        return
     
-    if ret['errno'] != 0:
-        logger.error(ret['errmsg'])
+    data = ret.json()
+    if data['errno'] != 0:
+        logger.error(data['errmsg'])
     else:
         logger.info('消息推送成功！')
 
@@ -253,8 +258,10 @@ def main_handler(event, context):
         main()
     except Exception as e:
         print('出问题了：', str(e))
+        return str(e)
     else:
         return 'success'
+
 
 if __name__ == "__main__":
     main()
