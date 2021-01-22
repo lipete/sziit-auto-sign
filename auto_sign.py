@@ -186,7 +186,6 @@ def sendByServerChan(sckey: str, subject: str, message: str) -> None:
         'desp': message
     }
     ret = requests.get(url, params)
-    logger.info(ret.status_code)
     if ret.status_code != 200:
         logger.error(f'ServerChan消息推送失败。HTTP状态码:{ret.status_code}')
         return
@@ -217,9 +216,9 @@ def main():
     users = config.get('users')
     fields = config.get('fields')
     email = config.get('email')
-    cpdaily = Cpdaily()
 
     for user in users:
+        cpdaily = Cpdaily()
         logger.info(user['username'])
         if cpdaily.login(user['username'], user['password']):
             task_list = cpdaily.getTaskList()
