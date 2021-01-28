@@ -86,7 +86,9 @@ class Cpdaily:
         ret = self.session.post(ret.url, data=body)
         logined = ret.url == self.login_success_url
         if not logined:
-            logger.error('登录失败')
+            #             logger.error('登录失败')
+            # 晚上签到的时候失败解决办法
+            logined = ret.url == 'https://auth.sziit.edu.cn/authserver/login'
         return logined
 
     def getTaskList(self) -> list:
